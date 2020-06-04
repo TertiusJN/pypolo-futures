@@ -1,4 +1,4 @@
-from kumex.base_request.base_request import KumexBaseRestApi
+from poloniex.base_request.base_request import KumexBaseRestApi
 
 
 class GetToken(KumexBaseRestApi):

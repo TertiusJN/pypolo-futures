@@ -5,15 +5,15 @@ from setuptools import setup
 
 
 setup(
-    name='python-kumex',
+    name='python-poloniex',
     version='v1.1.0',
-    packages=['kumex', 'kumex/base_request', 'kumex/marke_data', 'kumex/trade', 'kumex/user',
-              'kumex/websocket', 'kumex/ws_token'],
+    packages=['poloniex', 'poloniex/base_request', 'poloniex/market_data', 'poloniex/trade', 'poloniex/user',
+              'poloniex/websocket', 'poloniex/ws_token'],
     license="MIT",
     author='Grape',
     author_email="grape.zhang@kucoin.com",
     url='https://github.com/Kucoin/kumex-python-sdk',
-    description="kumex-api-sdk",
+    description="poloniex-api-sdk",
     install_requires=['requests', 'websockets'],
     classifiers=[
         "Programming Language :: Python :: 3",

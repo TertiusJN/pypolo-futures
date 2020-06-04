@@ -1,13 +1,7 @@
+
+pypolo-futures
 ===============================
-Welcome to python-kumex-sdk
-===============================
-
-.. image:: https://img.shields.io/pypi/l/python-kumex.svg
-    :target: https://github.com/Kucoin/kumex-python-sdk/blob/master/LICENSE
-
-.. image:: https://img.shields.io/badge/python-3.6%2B-green
-    :target: https://pypi.org/project/python-kumex
-
+Official Python 3 Wrapper for Poloniex Futures Exchange
 
 Features
 --------
@@ -17,25 +11,24 @@ Features
 - Response exception handling
 - Implement websockets (note only python3.6+)
 
-
 Quick Start
 -----------
 
-Register an account with `KuMEX <https://www.kumex.com/ucenter/signup>`_.
+Register an account with `Poloniex <https://www.poloniex.com/ucenter/signup>`_.
 
-To test on the Sandbox  with `KuMEX Sandbox <https://sandbox.kumex.com>`_.
+To test on the Sandbox  with `Poloniex Sandbox <https://sandbox.poloniex.com>`_.
 
-`Generate an API Key <https://www.kumex.com/api/create>`_
-or `Generate an API Key in Sandbox <https://sandbox.kucoin.com/account/api>`_ and enable it.
+`Generate an API Key <https://www.poloniex.com/api/create>`_
+or `Generate an API Key in Sandbox <https://sandbox.poloniex.com/account/api>`_ and enable it.
 
 .. code:: bash
 
-    pip install python-kumex
+    pip install pypolo-futures
 
 .. code:: python
 
     #  MarketData
-    from kumex.client import Market
+    from poloniex.client import Market
     client = Market()
     # or connect to Sandbox
     # client = Market(is_sandbox=True)
@@ -57,7 +50,7 @@ or `Generate an API Key in Sandbox <https://sandbox.kucoin.com/account/api>`_ an
     api_passphrase = '<api_passphrase>'
 
     # Trade
-    from kumex.client import Trade
+    from poloniex.client import Trade
     client = Trade(api_key, api_secret, api_passphrase)
 
     # or connect to Sandbox
@@ -69,14 +62,14 @@ or `Generate an API Key in Sandbox <https://sandbox.kucoin.com/account/api>`_ an
     # place a market buy order   Use cautiously
     order_id = client.create_market_order('XBTUSDM', 'buy', '1')
 
-    # cancel limit order 
+    # cancel limit order
     client.cancel_order('5bd6e9286d99522a52e458de')
 
-    # cancel all limit order 
+    # cancel all limit order
     client.cancel_all_limit_order('XBTUSDM')
 
     # User
-    from kumex.client import User
+    from poloniex.client import User
     client = User(api_key, api_secret, api_passphrase)
 
     # or connect to Sandbox
@@ -90,8 +83,8 @@ Websockets
 .. code:: python
 
     import asyncio
-    from kumex.client import WsToken
-    from kumex.ws_client import KumexWsClient
+    from poloniex.client import WSToken
+    from poloniex.ws_client import poloniexWSClient
 
 
     async def main():
@@ -106,8 +99,8 @@ Websockets
         # is private
         client = WsToken(key='', secret='', passphrase='')
         # is sandbox
-        # client = WsToken(is_sandbox=True)
-        ws_client = await KumexWsClient.create(loop, client, deal_msg, private=False)
+        # client = WSToken(is_sandbox=True)
+        ws_client = await poloniexWSClient.create(loop, client, deal_msg, private=False)
         await ws_client.subscribe('/contractMarket/level2:XBTUSDM')
         await ws_client.subscribe('/contractMarket/level3:XBTUSDM')
         while True:

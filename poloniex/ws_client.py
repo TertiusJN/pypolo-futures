@@ -1,6 +1,6 @@
-from kumex.websocket.websocket import ConnectWebsocket
+from poloniex.websocket.websocket import ConnectWebsocket
 
-class KumexWsClient:
+class PoloFuturesWSClient:
     """
     https://docs.kumex.com/#websocket-2
     """
@@ -14,7 +14,7 @@ class KumexWsClient:
 
     @classmethod
     async def create(cls, loop, client, callback, private=False):
-        self = KumexWsClient()
+        self = PoloFuturesWSClient()
         self._loop = loop
         self._client = client
         self._private = private

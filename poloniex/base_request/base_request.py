@@ -10,25 +10,19 @@ import time
 from uuid import uuid1
 from urllib.parse import urljoin
 
+SANDBOX_ENDPOINT = 'https://sandbox-api.kumex.com'
+LIVE_ENDPOINT = 'https://api.kumex.com'
 
-class KumexBaseRestApi(object):
+# TODO: Change KC to PF
+
+class PoloFuturesBaseRestApi(object):
 
     def __init__(self, key='', secret='', passphrase='', is_sandbox=False):
-        """
-        https://docs.kumex.com
 
-        :param key: Api Token Id  (Mandatory)
-        :type key: string
-        :param secret: Api Secret  (Mandatory)
-        :type secret: string
-        :param passphrase: Api Passphrase used to create API  (Mandatory)
-        :type passphrase: string
-        :param is_sandbox: True sandbox , False  (optional)
-        """
         if is_sandbox:
-            self.url = 'https://sandbox-api.kumex.com'
+            self.url = SANDBOX_ENDPOINT
         else:
-            self.url = 'https://api.kumex.com'
+            self.url = LIVE_ENDPOINT
         self.key = key
         self.secret = secret
         self.passphrase = passphrase
