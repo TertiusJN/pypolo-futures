@@ -1,4 +1,5 @@
 import asyncio
+import sys
 import json
 import time
 import websockets
@@ -23,6 +24,10 @@ class ConnectWebsocket:
         self._connect()
 
     def _connect(self):
+        '''
+        When the connection is successfully established, the system will send a welcome message. To query via User Messages, please add “acceptUserMessage=true” in the wss link.
+        connectId: the connection id, a unique value taken from the client side. Both the id of the welcome message and the id of the error message are connectId.
+        acceptUserMessage：if the value of acceptUserMessage equal with true, the User Messages can be received. '''
         self._conn = asyncio.ensure_future(self._run(), loop=self._loop)
 
     async def _run(self):
@@ -32,6 +37,8 @@ class ConnectWebsocket:
         self._ws_details = self._client.get_ws_token(self._private)
 
         async with websockets.connect(self.get_ws_endpoint(), ssl=self.get_ws_encryption()) as socket:
+            if not socket:
+                self._connect()
             self._socket = socket
             self._reconnect_num = 0
             try:
@@ -93,10 +100,13 @@ class ConnectWebsocket:
         return round(random() * min(self.MAX_RECONNECT_SECONDS, expo - 1) + 1)
 
     async def send_ping(self):
-        msg = {
-            'id': str(int(time.time() * 1000)),
-            'type': 'ping'
-        }
+        '''
+        To prevent the TCP link being disconnected by the server, the client side needs to send ping messages to the server to keep alive the link.
+        After the ping message is sent to the server, the system would return a pong message to the client side.
+        If the server has not received the ping from the client for 60 seconds , the connection will be disconnected.
+        '''
+
+        msg = {'id': str(int(time.time() * 1000)), 'type': 'ping'}
         await self._socket.send(json.dumps(msg))
         self._last_ping = time.time()
 
@@ -105,6 +115,8 @@ class ConnectWebsocket:
             if retry_count < 5:
                 await asyncio.sleep(1)
                 await self.send_message(msg, retry_count + 1)
+            else:
+                sys.exit('Unable to establish websocket connection!')
         else:
             msg['id'] = str(int(time.time() * 1000))
             msg['privateChannel'] = self._private
