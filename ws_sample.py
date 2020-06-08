@@ -17,16 +17,17 @@ async def ws_stream():
     async def deal_msg(msg):
         if msg['topic'] == '/contractMarket/level2:XBTUSDM':
             print(f'Get XBTUSDM Ticker: {msg["data"]}')
-        elif msg['topic'] == '/contractMarket/level3:XBTUSDM':
-            print(f'Get XBTUSDM level3: {msg["data"]}')
+        elif msg['topic'] == '/contractMarket/execution:XBTUSDM':
+            print(f'Last Execution: {msg["data"]}')
         elif msg['topic'] == '/contractMarket/ticker:XBTUSDM':
             print(f'Get XBTUSDM Tick :{msg["data"]}')
 
     ws = WSToken(API_KEY, SECRET, API_PASS, is_sandbox=SANDBOX)
     ws_client = await PoloFuturesWSClient.create(loop, ws, deal_msg, private=False)
 
+    # Set channel subscriptions
     await ws_client.subscribe('/contractMarket/level2:XBTUSDM')
-    await ws_client.subscribe('/contractMarket/level3:XBTUSDM')
+    await ws_client.subscribe('/contractMarket/execution:XBTUSDM')
     await ws_client.subscribe('/contractMarket/ticker:XBTUSDM')
     while True:
         await asyncio.sleep(0.5, loop=loop)
