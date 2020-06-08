@@ -13,7 +13,7 @@ setup(
     author_email="tnel@poloniex.com",
     url='https://github.com/Poloniex/pypolo-futures',
     description="Poloniex Futures Exchange Python 3 Wrapper",
-    install_requires=['requests', 'websockets', 'poloniex', 'futures', 'cryptocurrency'],
+    install_requires=['requests', 'websockets'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
