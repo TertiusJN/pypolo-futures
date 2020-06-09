@@ -1,7 +1,7 @@
 
 pypolo-futures
 ===============================
-Official Python 3 Wrapper for Poloniex Futures Exchange
+Python 3 Wrapper for Poloniex Futures Exchange
 
 Features
 --------
@@ -27,55 +27,43 @@ or `Generate an API Key in Sandbox <https://sandbox.poloniex.com/account/api>`_ 
 
 .. code:: python
 
-    #  MarketData
-    from poloniex.client import Market
-    client = Market()
-    # or connect to Sandbox
-    # client = Market(is_sandbox=True)
-
-    # get l3_order_book
-    l3_depth = client.l3_order_book('XBTUSDM')
-
-    # get l2_order_book
-    l2_depth = client.l2_order_book('XBTUSDM')
-
-    # get symbol ticker
-    klines = client.get_ticker("XBTUSDM")
-
-    # get symbol ticker
-    server_time = client.get_server_timestamp()
-
-    api_key = '<api_key>'
-    api_secret = '<api_secret>'
-    api_passphrase = '<api_passphrase>'
-
-    # Trade
+    import ssl
+    import os
     from poloniex.client import Trade
-    client = Trade(api_key, api_secret, api_passphrase)
-
-    # or connect to Sandbox
-    # client = Trade(api_key, api_secret, api_passphrase, is_sandbox=True)
-
-    # place a limit buy order
-    order_id = client.create_limit_order('XBTUSDM', 'buy', '1', '30', '8600')
-
-    # place a market buy order   Use cautiously
-    order_id = client.create_market_order('XBTUSDM', 'buy', '1')
-
-    # cancel limit order
-    client.cancel_order('5bd6e9286d99522a52e458de')
-
-    # cancel all limit order
-    client.cancel_all_limit_order('XBTUSDM')
-
-    # User
+    from poloniex.client import Market
     from poloniex.client import User
-    client = User(api_key, api_secret, api_passphrase)
 
-    # or connect to Sandbox
-    # client = User(api_key, api_secret, api_passphrase, is_sandbox=True)
+    context = ssl._create_unverified_context()
 
-    address = client.get_withdrawal_quota('XBT')
+    # Account Keys
+    API_KEY = os.environ['KUMEX_SBOX_API_KEY']
+    SECRET = os.environ['KUMEX_SBOX_SECRET']
+    API_PASS = os.environ['KUMEX_PASS']
+    SANDBOX = True
+
+    # Fetch MarketData
+    SYMBOL = 'XBTUSDM'
+    market = Market(is_sandbox=SANDBOX)
+
+    server_time = market.get_server_timestamp()
+    l3_depth = market.l3_order_book(SYMBOL)
+    l2_depth = market.l2_order_book(SYMBOL)
+    klines = market.get_ticker(SYMBOL)
+
+
+    # Trade Functions
+    trade = Trade(API_KEY, SECRET, API_PASS, is_sandbox=SANDBOX)
+
+    order_id = trade.create_limit_order(SYMBOL, 'buy', '1', '30', '8600')
+    cancel_id = trade.cancel_order(order_id['orderId'])
+    order_id = trade.create_limit_order(SYMBOL, 'buy', '1', '30', '8600')
+    cancel_all = trade.cancel_all_limit_order(SYMBOL)
+
+    # User Account Functions
+    user = User(API_KEY, SECRET, API_PASS, is_sandbox=SANDBOX)
+    address = user.get_withdrawal_quota('XBT')
+
+
 
 Websockets
 ----------
@@ -83,30 +71,40 @@ Websockets
 .. code:: python
 
     import asyncio
+    import ssl
+    import os
+
     from poloniex.client import WSToken
-    from poloniex.ws_client import poloniexWSClient
+    from poloniex.ws_client import PoloFuturesWSClient
+
+    # Account Keys
+    context = ssl._create_unverified_context()
+    API_KEY = os.environ['KUMEX_SBOX_API_KEY']
+    SECRET = os.environ['KUMEX_SBOX_SECRET']
+    API_PASS = os.environ['KUMEX_PASS']
+    SANDBOX = True
 
 
-    async def main():
+    async def ws_stream():
         async def deal_msg(msg):
             if msg['topic'] == '/contractMarket/level2:XBTUSDM':
-                print(f'Get XBTUSDM Ticker:{msg["data"]}')
-            elif msg['topic'] == '/contractMarket/level3:XBTUSDM':
-                print(f'Get XBTUSDM level3:{msg["data"]}')
+                print(f'Get XBTUSDM Ticker: {msg["data"]}')
+            elif msg['topic'] == '/contractMarket/execution:XBTUSDM':
+                print(f'Last Execution: {msg["data"]}')
+            elif msg['topic'] == '/contractMarket/ticker:XBTUSDM':
+                print(f'Get XBTUSDM Tick :{msg["data"]}')
 
-        # is public
-        # client = WsToken()
-        # is private
-        client = WsToken(key='', secret='', passphrase='')
-        # is sandbox
-        # client = WSToken(is_sandbox=True)
-        ws_client = await poloniexWSClient.create(loop, client, deal_msg, private=False)
+        ws = WSToken(API_KEY, SECRET, API_PASS, is_sandbox=SANDBOX)
+        ws_client = await PoloFuturesWSClient.create(loop, ws, deal_msg, private=False)
+
+        # Set channel subscriptions
         await ws_client.subscribe('/contractMarket/level2:XBTUSDM')
-        await ws_client.subscribe('/contractMarket/level3:XBTUSDM')
+        await ws_client.subscribe('/contractMarket/execution:XBTUSDM')
+        await ws_client.subscribe('/contractMarket/ticker:XBTUSDM')
         while True:
-            await asyncio.sleep(60, loop=loop)
+            await asyncio.sleep(0.5, loop=loop)
 
 
     if __name__ == "__main__":
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(main())
+        loop.run_until_complete(ws_stream())

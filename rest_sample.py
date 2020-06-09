@@ -34,6 +34,3 @@ cancel_all = trade.cancel_all_limit_order(SYMBOL)
 user = User(API_KEY, SECRET, API_PASS, is_sandbox=SANDBOX)
 address = user.get_withdrawal_quota('XBT')
 
-
-
-
